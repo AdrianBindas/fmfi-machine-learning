@@ -45,34 +45,6 @@ def naive_symmetry(img_path):
     return sum(scores.values()) / 360
 
 
-def contour_area(img_path):
-    """
-    Calculate area of the largest contour.
-    """
-    img = load_image(img_path, grayscale=True)
-    contours, hierarchy = cv2.findContours(image=img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
-    
-    if not contours:
-        return 0.0
-    
-    largest_contour = max(contours, key=cv2.contourArea)
-    return float(cv2.contourArea(largest_contour))
-
-
-def contour_perimeter(img_path):
-    """
-    Calculate perimeter of the largest contour.
-    """
-    img = load_image(img_path, grayscale=True)
-    contours, hierarchy = cv2.findContours(image=img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
-    
-    if not contours:
-        return 0.0
-    
-    largest_contour = max(contours, key=cv2.contourArea)
-    return float(cv2.arcLength(largest_contour, True))
-
-
 def grayscale_variance(img_path, mask_path):
     """
     Convert image to grayscale and calculate variance of an image within the mask.
@@ -133,10 +105,10 @@ def color_histogram(img_path, mask_path, bins=32):
         hist = hist.flatten() / (hist.sum() + 1e-7)
         histograms.append(hist)
     
-    return np.concatenate(histograms)
+    return histograms
 
 
-def contour_approximate(img_path, epsilon_factor=0.05):
+def contour_approximate(img_path, epsilon_factor=0.01):
     """
     Approximate image contour using cv2.approxPolyDP.
     """
@@ -160,7 +132,7 @@ def contour_approximate(img_path, epsilon_factor=0.05):
     return int(len(approx))
 
 
-def solidity(img_path):
+def contour_solidity(img_path):
     """
     Solidity = contour area / convex hull area
     """
@@ -183,5 +155,29 @@ def solidity(img_path):
     if hull_area == 0:
         return 0.0
     
-    solidity = area / hull_area
-    return float(solidity)
+    return area / hull_area
+
+
+def contour_circularity(img_path):
+    """
+    Circularity = 4*pi*area / perimeter^2
+    """
+    img = load_image(img_path, grayscale=True)
+    contours, hierarchy = cv2.findContours(
+        image=img, 
+        mode=cv2.RETR_EXTERNAL, 
+        method=cv2.CHAIN_APPROX_NONE
+    )
+    
+    if not contours:
+        return 0.0
+    
+    largest_contour = max(contours, key=cv2.contourArea)
+    area = cv2.contourArea(largest_contour)
+    
+    perimeter = cv2.arcLength(largest_contour, closed=True)
+    
+    if perimeter == 0:
+        return 0.0
+    
+    return 4*np.pi*area / perimeter**2

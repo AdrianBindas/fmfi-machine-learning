@@ -38,3 +38,11 @@ def find_max_contour(img_path):
     contours, hierarchy = cv2.findContours(image=img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
     largest_contour = max(contours, key=cv2.contourArea)
     return cv2.drawContours(image=np.zeros_like(img), contours=[largest_contour], contourIdx=-1, color=255, thickness=cv2.FILLED)
+
+
+def find_convex_hull(img_path):
+    img = load_image(img_path, grayscale=True)
+    contours, hierarchy = cv2.findContours(image=img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
+    largest_contour = max(contours, key=cv2.contourArea)
+    convex_hull = cv2.convexHull(largest_contour)
+    return cv2.drawContours(image=np.zeros_like(img), contours=[convex_hull], contourIdx=-1, color=255, thickness=cv2.FILLED)
