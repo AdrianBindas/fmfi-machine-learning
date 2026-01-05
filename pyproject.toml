@@ -3,32 +3,11 @@ name = "machine-learning"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12.9"
 dependencies = [
-    "emoji==2.8.0",
     "ipykernel>=7.1.0",
-    "keras-core>=0.1.7",
-    "matplotlib>=3.10.7",
-    "numpy>=2.3.4",
-    "pillow>=12.0.0",
-    "pilmoji>=2.0.4",
+    "matplotlib>=3.10.8",
+    "opencv-python>=4.12.0.88",
     "pip>=25.3",
-    "ruff>=0.14.2",
-    "scikit-learn>=1.7.2",
-    "tensorflow>=2.20.0",
-    "torch>=2.9.1",
-    "torchvision>=0.24.1",
-]
-
-[[tool.uv.index]]
-name = "pytorch-cu128"
-url = "https://download.pytorch.org/whl/cu128"
-explicit = true
-
-[tool.uv.sources]
-torch = [
-  { index = "pytorch-cu128", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
-]
-torchvision = [
-  { index = "pytorch-cu128", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    "polars>=1.36.1",
 ]

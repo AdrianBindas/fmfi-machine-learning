@@ -11,3 +11,6 @@ wheels/
 
 # Dataset
 project/data
+
+# Logs
+project/log.txt
