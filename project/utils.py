@@ -218,3 +218,75 @@ class Pipeline:
                     print(f"    ✗ {p.name}")
         
         return results
+
+    def apply_to_columns(
+        self,
+        columns: list,
+        func: Callable,
+        new_column: str,
+        on_split: list = ['test', 'valid'],
+    ) -> 'Pipeline':
+        """
+        Apply a function that takes multiple column values as input.
+        
+        Args:
+            columns: List of column names to pass to the function
+            func: Function that takes multiple arguments (one per column)
+            new_column: Name of new column for results
+            on_split: Dataframe split to apply on
+        
+        Returns:
+            Updated Pipeline object
+        """
+        for split in on_split:
+            df = self.splits[split]
+            
+            column_values = [df[col] for col in columns]
+            
+            processed = [func(*row_values) for row_values in zip(*column_values)]
+            
+            self.splits[split] = df.with_columns(pl.Series(name=new_column, values=processed))
+        
+        print(f"Column '{new_column}' added from {len(columns)} input column(s)")
+        
+        return self
+    
+    def apply_to_columns_multi_output(
+        self,
+        columns: list,
+        func: Callable,
+        new_columns: list,
+        on_split: list = ['test', 'valid'],
+    ) -> 'Pipeline':
+        """
+        Apply a function that takes multiple inputs and returns multiple outputs.
+        
+        Args:
+            columns: List of column names to pass to the function
+            func: Function that returns a tuple/list of values
+            new_columns: List of new column names for results
+            on_split: Dataframe split to apply on
+        
+        Returns:
+            Updated Pipeline object
+        """
+        for split in on_split:
+            df = self.splits[split]
+            
+            column_values = [df[col] for col in columns]
+            
+            results = [func(*row_values) for row_values in zip(*column_values)]
+            
+            if results and isinstance(results[0], (tuple, list)):
+                transposed = list(zip(*results))
+            else:
+                transposed = [results]
+            
+            for col_name, col_values in zip(new_columns, transposed):
+                df = df.with_columns(pl.Series(name=col_name, values=list(col_values)))
+            
+            self.splits[split] = df
+        
+        print(f"{len(new_columns)} column(s) added: {', '.join(new_columns)}")
+        
+        return self
