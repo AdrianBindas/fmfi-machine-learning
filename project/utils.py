@@ -19,20 +19,14 @@ def load_image(filepath, grayscale = False):
     return cv2.imread(str(filepath))
 
 
-def init_dataframe(image_folder_path, label_file_path):
+def init_dataframe_from_folder(image_folder_path):
     images = get_image_paths(image_folder_path)
-    label_df = pl.read_csv(label_file_path, has_header=True)
     image_df = pl.DataFrame({
         "sample_id": range(len(images)),
         "image": [path.stem for path in images],
         "image_path": [str(path) for path in images]
     })
-    df = image_df.join(
-        label_df,
-        on="image",
-        how="left",
-    )
-    return df
+    return image_df
 
 
 class Pipeline:
